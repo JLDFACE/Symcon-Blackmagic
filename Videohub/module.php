@@ -268,14 +268,17 @@ class BlackmagicVideohub extends IPSModule
      */
     public function ApplyLabels(string $Labels)
     {
-        $data = json_decode($Labels, true);
-        if (!is_array($data)) {
+        $this->SendDebug('ApplyLabels', $Labels, 0);
+
+        $data = $this->DecodeRows($Labels);
+        if (count($data) === 0) {
             echo 'Beschriftung konnte nicht gelesen werden.';
             return;
         }
 
         $topology = $this->GetTopology();
         $sent = 0;
+        $seen = 0;
 
         $blocks = [
             'inputs'  => ['header' => 'INPUT LABELS',  'key' => 'inputLabels',  'max' => (int)$topology['inputs']],
@@ -283,12 +286,19 @@ class BlackmagicVideohub extends IPSModule
         ];
 
         foreach ($blocks as $name => $spec) {
-            if (!isset($data[$name]) || !is_array($data[$name])) {
+            if (!isset($data[$name])) {
                 continue;
             }
 
+            // Symcon reicht Listenwerte im onClick als JSON-String durch, nicht als Array
+            $rows = $this->DecodeRows($data[$name]);
+
             $lines = [];
-            foreach ($data[$name] as $row) {
+            foreach ($rows as $row) {
+                if (!is_array($row)) {
+                    continue;
+                }
+                $seen++;
                 if (!isset($row['Port'])) {
                     continue;
                 }
@@ -312,12 +322,36 @@ class BlackmagicVideohub extends IPSModule
             }
         }
 
+        if ($seen === 0) {
+            echo 'Es kamen keine Zeilen aus dem Formular an – bitte einmal "Aktualisieren" klicken und erneut versuchen.';
+            return;
+        }
+
         if ($sent === 0) {
-            echo 'Keine Änderung – die Beschriftung im Videohub ist bereits aktuell.';
+            echo 'Keine Änderung – die ' . $seen . ' Zeilen stimmen mit dem Videohub überein.';
             return;
         }
 
         echo $sent . ' Beschriftung(en) an den Videohub übertragen.';
+    }
+
+    /**
+     * Nimmt eine Zeilenliste entgegen, egal ob als Array oder – wie Symcon es
+     * aus dem Formular liefert – als JSON-String.
+     */
+    private function DecodeRows($Value)
+    {
+        $depth = 0;
+        while (is_string($Value) && $depth < 3) {
+            $decoded = json_decode($Value, true);
+            if ($decoded === null) {
+                return [];
+            }
+            $Value = $decoded;
+            $depth++;
+        }
+
+        return is_array($Value) ? $Value : [];
     }
 
     public function SetInputLabel(int $Input, string $Label)
