@@ -151,7 +151,51 @@ class BlackmagicVideohub extends IPSModule
             }
         }
 
+        $this->FillLabelLists($form, $topology);
+
         return json_encode($form);
+    }
+
+    /**
+     * Füllt die beiden Beschriftungslisten mit dem, was aktuell im Videohub steht.
+     */
+    private function FillLabelLists(array &$Form, array $Topology)
+    {
+        $lists = [
+            'InputLabels'  => ['count' => (int)$Topology['inputs'],  'labels' => $Topology['inputLabels'],  'fallback' => 'Eingang '],
+            'OutputLabels' => ['count' => (int)$Topology['outputs'], 'labels' => $Topology['outputLabels'], 'fallback' => 'Ausgang ']
+        ];
+
+        foreach ($Form['actions'] as &$action) {
+            if (!isset($action['items'])) {
+                continue;
+            }
+            foreach ($action['items'] as &$item) {
+                $rows = isset($item['items']) ? $item['items'] : [$item];
+                foreach ($rows as &$candidate) {
+                    if (!isset($candidate['name']) || !isset($lists[$candidate['name']])) {
+                        continue;
+                    }
+                    $spec = $lists[$candidate['name']];
+                    $values = [];
+                    for ($port = 1; $port <= $spec['count']; $port++) {
+                        $label = isset($spec['labels'][$port - 1]) ? (string)$spec['labels'][$port - 1] : '';
+                        if ($label === '') {
+                            $label = $spec['fallback'] . $port;
+                        }
+                        $values[] = ['Port' => $port, 'Label' => $label];
+                    }
+                    $candidate['values'] = $values;
+                    $candidate['rowCount'] = max(2, min(16, $spec['count']));
+                }
+                unset($candidate);
+                if (isset($item['items'])) {
+                    $item['items'] = $rows;
+                }
+            }
+            unset($item);
+        }
+        unset($action);
     }
 
     public function RequestAction($Ident, $Value)
@@ -215,6 +259,65 @@ class BlackmagicVideohub extends IPSModule
         }
 
         $this->SendBlock('VIDEO OUTPUT LOCKS', [($Output - 1) . ' ' . $code]);
+    }
+
+    /**
+     * Überträgt die im Formular bearbeitete Beschriftung. Erwartet
+     * {"inputs":[{"Port":1,"Label":"..."}],"outputs":[...]} und schickt nur,
+     * was sich gegenüber dem Gerätestand geändert hat.
+     */
+    public function ApplyLabels(string $Labels)
+    {
+        $data = json_decode($Labels, true);
+        if (!is_array($data)) {
+            echo 'Beschriftung konnte nicht gelesen werden.';
+            return;
+        }
+
+        $topology = $this->GetTopology();
+        $sent = 0;
+
+        $blocks = [
+            'inputs'  => ['header' => 'INPUT LABELS',  'key' => 'inputLabels',  'max' => (int)$topology['inputs']],
+            'outputs' => ['header' => 'OUTPUT LABELS', 'key' => 'outputLabels', 'max' => (int)$topology['outputs']]
+        ];
+
+        foreach ($blocks as $name => $spec) {
+            if (!isset($data[$name]) || !is_array($data[$name])) {
+                continue;
+            }
+
+            $lines = [];
+            foreach ($data[$name] as $row) {
+                if (!isset($row['Port'])) {
+                    continue;
+                }
+                $port = (int)$row['Port'];
+                $label = trim((string)(isset($row['Label']) ? $row['Label'] : ''));
+                if ($port < 1 || $port > $spec['max'] || $label === '') {
+                    continue;
+                }
+
+                $current = isset($topology[$spec['key']][$port - 1]) ? (string)$topology[$spec['key']][$port - 1] : '';
+                if ($current === $label) {
+                    continue;
+                }
+
+                $lines[] = ($port - 1) . ' ' . $label;
+            }
+
+            if (count($lines) > 0) {
+                $this->SendBlock($spec['header'], $lines);
+                $sent += count($lines);
+            }
+        }
+
+        if ($sent === 0) {
+            echo 'Keine Änderung – die Beschriftung im Videohub ist bereits aktuell.';
+            return;
+        }
+
+        echo $sent . ' Beschriftung(en) an den Videohub übertragen.';
     }
 
     public function SetInputLabel(int $Input, string $Label)

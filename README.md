@@ -71,6 +71,7 @@ BMVH_SetRoute(int $InstanceID, int $Output, int $Input);      // Eingang auf Aus
 BMVH_SetOutputLock(int $InstanceID, int $Output, int $State); // 0 = frei, 1 = sperren
 BMVH_SetInputLabel(int $InstanceID, int $Input, string $Label);
 BMVH_SetOutputLabel(int $InstanceID, int $Output, string $Label);
+BMVH_ApplyLabels(int $InstanceID, string $Labels);            // aus dem Formular
 BMVH_RequestStatus(int $InstanceID);                          // kompletten Status neu anfordern
 BMVH_Reconnect(int $InstanceID, bool $Force);
 BMVH_TestConnection(int $InstanceID);
@@ -82,6 +83,18 @@ Beispiel – Eingang 3 auf Ausgang 7 legen:
 ```php
 BMVH_SetRoute(12345, 7, 3);
 ```
+
+## Beschriftung
+
+Im Konfigurationsformular steht unter „Ein- und Ausgänge beschriften" je eine
+Liste für Ein- und Ausgänge. Die Felder sind direkt editierbar; ein Klick auf
+„Beschriftung zum Videohub übertragen" schickt nur das, was sich geändert hat.
+
+Die Beschriftung liegt im Videohub selbst und gilt damit auch für Videohub
+Control und das Frontpanel. Umlaute funktionieren – am Gerät gegengelesen.
+Zurück kommen die Labels als Statusupdate: Eingangsnamen landen im Auswahl-
+profil der Ausgangsvariablen, Ausgangsnamen werden zu deren Variablennamen
+(sofern „Variablennamen aus den Ausgangs-Labels übernehmen" aktiv ist).
 
 ## Praxiswissen zum Gerät
 

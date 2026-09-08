@@ -59,6 +59,75 @@
     },
     {
       "type": "ExpansionPanel",
+      "caption": "Ein- und Ausgänge beschriften",
+      "items": [
+        {
+          "type": "Label",
+          "name": "LabelHint",
+          "caption": "Die Beschriftung wird im Videohub selbst gespeichert und gilt damit auch für Videohub Control und das Frontpanel."
+        },
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "List",
+              "name": "InputLabels",
+              "caption": "Eingänge",
+              "rowCount": 10,
+              "add": false,
+              "delete": false,
+              "columns": [
+                {
+                  "caption": "Nr.",
+                  "name": "Port",
+                  "width": "60px"
+                },
+                {
+                  "caption": "Beschriftung",
+                  "name": "Label",
+                  "width": "auto",
+                  "edit": {
+                    "type": "ValidationTextBox"
+                  }
+                }
+              ],
+              "values": []
+            },
+            {
+              "type": "List",
+              "name": "OutputLabels",
+              "caption": "Ausgänge",
+              "rowCount": 10,
+              "add": false,
+              "delete": false,
+              "columns": [
+                {
+                  "caption": "Nr.",
+                  "name": "Port",
+                  "width": "60px"
+                },
+                {
+                  "caption": "Beschriftung",
+                  "name": "Label",
+                  "width": "auto",
+                  "edit": {
+                    "type": "ValidationTextBox"
+                  }
+                }
+              ],
+              "values": []
+            }
+          ]
+        },
+        {
+          "type": "Button",
+          "caption": "Beschriftung zum Videohub übertragen",
+          "onClick": "BMVH_ApplyLabels($id, json_encode(['inputs' => $InputLabels, 'outputs' => $OutputLabels]));"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
       "caption": "Routing testen",
       "items": [
         {
