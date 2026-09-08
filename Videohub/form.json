@@ -29,33 +29,6 @@
       "minimum": 10,
       "maximum": 600,
       "suffix": "s"
-    }
-  ],
-  "actions": [
-    {
-      "type": "Label",
-      "name": "TopologyInfo",
-      "caption": ""
-    },
-    {
-      "type": "RowLayout",
-      "items": [
-        {
-          "type": "Button",
-          "caption": "Verbindung testen",
-          "onClick": "BMVH_TestConnection($id);"
-        },
-        {
-          "type": "Button",
-          "caption": "Status neu abfragen",
-          "onClick": "BMVH_RequestStatus($id);"
-        },
-        {
-          "type": "Button",
-          "caption": "Neu verbinden",
-          "onClick": "BMVH_Reconnect($id, true);"
-        }
-      ]
     },
     {
       "type": "ExpansionPanel",
@@ -120,11 +93,42 @@
           ]
         },
         {
-          "type": "Button",
-          "caption": "Beschriftung zum Videohub übertragen",
-          "onClick": "BMVH_ApplyLabels($id, json_encode(['inputs' => $InputLabels, 'outputs' => $OutputLabels]));"
+          "type": "Label",
+          "caption": "Nach dem Bearbeiten unten auf \"Beschriftung zum Videohub übertragen\" klicken."
         }
       ]
+    }
+  ],
+  "actions": [
+    {
+      "type": "Label",
+      "name": "TopologyInfo",
+      "caption": ""
+    },
+    {
+      "type": "RowLayout",
+      "items": [
+        {
+          "type": "Button",
+          "caption": "Verbindung testen",
+          "onClick": "BMVH_TestConnection($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Status neu abfragen",
+          "onClick": "BMVH_RequestStatus($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Neu verbinden",
+          "onClick": "BMVH_Reconnect($id, true);"
+        }
+      ]
+    },
+    {
+      "type": "Button",
+      "caption": "Beschriftung zum Videohub übertragen",
+      "onClick": "BMVH_ApplyLabels($id, json_encode(['inputs' => $InputLabels, 'outputs' => $OutputLabels]));"
     },
     {
       "type": "ExpansionPanel",

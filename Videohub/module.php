@@ -37,6 +37,8 @@ class BlackmagicVideohub extends IPSModule
         $this->RegisterPropertyBoolean('CreateLockVariables', false);
         $this->RegisterPropertyBoolean('SyncOutputNames', true);
         $this->RegisterPropertyInteger('WatchdogInterval', 30);
+        $this->RegisterPropertyString('InputLabels', '[]');
+        $this->RegisterPropertyString('OutputLabels', '[]');
 
         // Topologie und Labels überleben Neustart und Modul-Update
         $this->RegisterAttributeString('Topology', '');
@@ -166,7 +168,9 @@ class BlackmagicVideohub extends IPSModule
             'OutputLabels' => ['count' => (int)$Topology['outputs'], 'labels' => $Topology['outputLabels'], 'fallback' => 'Ausgang ']
         ];
 
-        foreach ($Form['actions'] as &$action) {
+        $sections = ['elements', 'actions'];
+        foreach ($sections as $section) {
+        foreach ($Form[$section] as &$action) {
             if (!isset($action['items'])) {
                 continue;
             }
@@ -196,6 +200,7 @@ class BlackmagicVideohub extends IPSModule
             unset($item);
         }
         unset($action);
+        }
     }
 
     public function RequestAction($Ident, $Value)
@@ -271,9 +276,17 @@ class BlackmagicVideohub extends IPSModule
         $this->SendDebug('ApplyLabels', $Labels, 0);
 
         $data = $this->DecodeRows($Labels);
-        if (count($data) === 0) {
-            echo 'Beschriftung konnte nicht gelesen werden.';
-            return;
+
+        // Kommt aus dem onClick nichts Brauchbares, greifen wir auf die
+        // gespeicherten Listen zurück – die stehen nach "Übernehmen" bereit.
+        $fromProperties = false;
+        if (count($this->DecodeRows(isset($data['inputs']) ? $data['inputs'] : null)) === 0
+            && count($this->DecodeRows(isset($data['outputs']) ? $data['outputs'] : null)) === 0) {
+            $data = [
+                'inputs'  => $this->ReadPropertyString('InputLabels'),
+                'outputs' => $this->ReadPropertyString('OutputLabels')
+            ];
+            $fromProperties = true;
         }
 
         $topology = $this->GetTopology();
@@ -323,7 +336,12 @@ class BlackmagicVideohub extends IPSModule
         }
 
         if ($seen === 0) {
-            echo 'Es kamen keine Zeilen aus dem Formular an – bitte einmal "Aktualisieren" klicken und erneut versuchen.';
+            $hint = 'Es kamen keine Zeilen an. Bitte die Beschriftung bearbeiten, mit "Übernehmen" speichern '
+                . 'und dann erneut übertragen.';
+            if (trim((string)$Labels) !== '') {
+                $hint .= ' (Das Formular lieferte: ' . substr($Labels, 0, 120) . ')';
+            }
+            echo $hint;
             return;
         }
 

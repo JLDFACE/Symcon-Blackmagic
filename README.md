@@ -87,8 +87,13 @@ BMVH_SetRoute(12345, 7, 3);
 ## Beschriftung
 
 Im Konfigurationsformular steht unter „Ein- und Ausgänge beschriften" je eine
-Liste für Ein- und Ausgänge. Die Felder sind direkt editierbar; ein Klick auf
-„Beschriftung zum Videohub übertragen" schickt nur das, was sich geändert hat.
+Liste für Ein- und Ausgänge, vorbelegt mit dem, was im Videohub steht. Die
+Felder sind direkt editierbar. Danach **„Übernehmen"**, dann „Beschriftung zum
+Videohub übertragen" – gesendet wird nur, was sich geändert hat.
+
+Die Listen liegen bewusst in `elements` und nicht in `actions`: Nur dort stellt
+Symcon ihre Werte im `onClick` bereit. Als zweiten Weg liest die Funktion die
+gespeicherten Listen aus den Properties, falls über den Button nichts ankommt.
 
 Die Beschriftung liegt im Videohub selbst und gilt damit auch für Videohub
 Control und das Frontpanel. Umlaute funktionieren – am Gerät gegengelesen.
