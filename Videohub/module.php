@@ -789,8 +789,9 @@ class BlackmagicVideohub extends IPSModule
     /**
      * RequireParent() legt den Client Socket nur an, wenn die Instanz über die
      * Konsole entsteht – per IPS_CreateInstance angelegte Instanzen bleiben ohne
-     * Socket zurück. Hier wird gezielt ein eigener Socket erzeugt und verbunden,
-     * statt sich an eine fremde, bereits vorhandene Socket-Instanz zu hängen.
+     * Socket zurück. ConnectParent() holt das nach. Kein IPS_CreateInstance an
+     * dieser Stelle: Ein Verbinden aus dem eigenen ApplyChanges heraus greift
+     * nicht, und übrig bleibt bei jedem Aufruf ein herrenloser Socket.
      */
     private function EnsureParent()
     {
@@ -798,14 +799,12 @@ class BlackmagicVideohub extends IPSModule
             return;
         }
 
-        $connID = @IPS_CreateInstance(self::IO_MODULE);
-        if ($connID === false || (int)$connID == 0) {
-            $this->LogMessage('Client Socket konnte nicht angelegt werden.', KL_WARNING);
-            return;
-        }
+        $this->ConnectParent(self::IO_MODULE);
 
-        @IPS_SetName($connID, 'Videohub Socket');
-        @IPS_ConnectInstance($this->InstanceID, $connID);
+        $connID = $this->GetConnectionID();
+        if ($connID > 0 && IPS_GetName($connID) === 'Client Socket') {
+            @IPS_SetName($connID, 'Videohub Socket');
+        }
     }
 
     private function ConfigureParent()
