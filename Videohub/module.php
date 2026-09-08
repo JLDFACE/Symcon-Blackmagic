@@ -307,19 +307,22 @@ class BlackmagicVideohub extends IPSModule
             $rows = $this->DecodeRows($data[$name]);
 
             $lines = [];
+            $index = 0;
             foreach ($rows as $row) {
                 if (!is_array($row)) {
                     continue;
                 }
-                $seen++;
-                if (!isset($row['Port'])) {
-                    continue;
-                }
-                $port = (int)$row['Port'];
+                $index++;
+
+                // Symcon speichert von einer List nur die editierbaren Spalten –
+                // die Nummer fällt dabei weg. Sie steckt dann in der Reihenfolge,
+                // die bei fester Zeilenzahl (kein add/delete) verlässlich ist.
+                $port = isset($row['Port']) ? (int)$row['Port'] : $index;
                 $label = trim((string)(isset($row['Label']) ? $row['Label'] : ''));
                 if ($port < 1 || $port > $spec['max'] || $label === '') {
                     continue;
                 }
+                $seen++;
 
                 $current = isset($topology[$spec['key']][$port - 1]) ? (string)$topology[$spec['key']][$port - 1] : '';
                 if ($current === $label) {
