@@ -1,0 +1,103 @@
+{
+  "elements": [
+    {
+      "type": "ValidationTextBox",
+      "name": "Host",
+      "caption": "IP-Adresse oder Hostname"
+    },
+    {
+      "type": "NumberSpinner",
+      "name": "Port",
+      "caption": "Port",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    {
+      "type": "CheckBox",
+      "name": "SyncOutputNames",
+      "caption": "Variablennamen aus den Ausgangs-Labels des Videohubs übernehmen"
+    },
+    {
+      "type": "CheckBox",
+      "name": "CreateLockVariables",
+      "caption": "Sperr-Variablen je Ausgang anlegen"
+    },
+    {
+      "type": "NumberSpinner",
+      "name": "WatchdogInterval",
+      "caption": "Überwachungsintervall (Sekunden)",
+      "minimum": 10,
+      "maximum": 600,
+      "suffix": "s"
+    }
+  ],
+  "actions": [
+    {
+      "type": "Label",
+      "name": "TopologyInfo",
+      "caption": ""
+    },
+    {
+      "type": "RowLayout",
+      "items": [
+        {
+          "type": "Button",
+          "caption": "Verbindung testen",
+          "onClick": "BMVH_TestConnection($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Status neu abfragen",
+          "onClick": "BMVH_RequestStatus($id);"
+        },
+        {
+          "type": "Button",
+          "caption": "Neu verbinden",
+          "onClick": "BMVH_Reconnect($id, true);"
+        }
+      ]
+    },
+    {
+      "type": "ExpansionPanel",
+      "caption": "Routing testen",
+      "items": [
+        {
+          "type": "RowLayout",
+          "items": [
+            {
+              "type": "NumberSpinner",
+              "name": "TestOutput",
+              "caption": "Ausgang",
+              "minimum": 1,
+              "maximum": 288
+            },
+            {
+              "type": "NumberSpinner",
+              "name": "TestInput",
+              "caption": "Eingang",
+              "minimum": 1,
+              "maximum": 288
+            },
+            {
+              "type": "Button",
+              "caption": "Schalten",
+              "onClick": "BMVH_SetRoute($id, $TestOutput, $TestInput);"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "status": [
+    {
+      "code": 102,
+      "icon": "active",
+      "caption": "Aktiv"
+    },
+    {
+      "code": 104,
+      "icon": "inactive",
+      "caption": "Keine Adresse eingetragen"
+    }
+  ]
+}

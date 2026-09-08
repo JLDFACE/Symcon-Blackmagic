@@ -1,0 +1,17 @@
+{
+  "id": "{5C34AC39-6DD6-4EC6-9CA2-1AB49E958998}",
+  "name": "Blackmagic Videohub",
+  "type": 3,
+  "vendor": "FACE GmbH",
+  "aliases": [
+    "Videohub",
+    "Blackmagic Videohub 10x10 12G",
+    "Smart Videohub",
+    "Universal Videohub",
+    "SDI Matrix"
+  ],
+  "parentRequirements": [],
+  "childRequirements": [],
+  "implemented": [],
+  "prefix": "BMVH"
+}

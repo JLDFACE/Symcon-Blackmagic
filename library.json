@@ -1,0 +1,12 @@
+{
+  "id": "{E161F2AB-F4CE-4B04-983C-9C323EB4E3A0}",
+  "author": "FACE GmbH",
+  "name": "Blackmagic Design",
+  "url": "https://github.com/JLDFACE/Symcon-Blackmagic",
+  "compatibility": {
+    "version": "7.0"
+  },
+  "version": "1.0",
+  "build": 1,
+  "date": 20260908
+}
