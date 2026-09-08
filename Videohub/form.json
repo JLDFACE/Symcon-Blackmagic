@@ -94,7 +94,7 @@
         },
         {
           "type": "Label",
-          "caption": "Nach dem Bearbeiten unten auf \"Beschriftung zum Videohub übertragen\" klicken."
+          "caption": "Nach dem Bearbeiten zuerst \"Übernehmen\" klicken – erst dann kann die Beschriftung übertragen werden."
         }
       ]
     }
@@ -127,8 +127,8 @@
     },
     {
       "type": "Button",
-      "caption": "Beschriftung zum Videohub übertragen",
-      "onClick": "BMVH_ApplyLabels($id, json_encode(['inputs' => $InputLabels, 'outputs' => $OutputLabels]));"
+      "caption": "Gespeicherte Beschriftung zum Videohub übertragen",
+      "onClick": "BMVH_ApplyLabels($id, '');"
     },
     {
       "type": "ExpansionPanel",

@@ -91,9 +91,19 @@ Liste für Ein- und Ausgänge, vorbelegt mit dem, was im Videohub steht. Die
 Felder sind direkt editierbar. Danach **„Übernehmen"**, dann „Beschriftung zum
 Videohub übertragen" – gesendet wird nur, was sich geändert hat.
 
-Die Listen liegen bewusst in `elements` und nicht in `actions`: Nur dort stellt
-Symcon ihre Werte im `onClick` bereit. Als zweiten Weg liest die Funktion die
-gespeicherten Listen aus den Properties, falls über den Button nichts ankommt.
+Der Zwischenschritt „Übernehmen" ist nötig: **Symcon stellt die Werte einer
+`List` im `onClick` eines Buttons nicht als Variable bereit** – weder aus
+`actions` noch aus `elements`; der Zugriff endet in „Undefined variable". Der
+Button übergibt deshalb nichts, und `BMVH_ApplyLabels` liest die Listen aus den
+Properties, wo „Übernehmen" sie ablegt. Wird der Funktion ein Payload übergeben,
+hat das Vorrang – für den Gebrauch aus Skripten:
+
+```php
+BMVH_ApplyLabels($id, json_encode([
+    'inputs'  => [['Port' => 1, 'Label' => 'Kamera Bühne']],
+    'outputs' => [['Port' => 1, 'Label' => 'Beamer Saal']]
+]));
+```
 
 Die Beschriftung liegt im Videohub selbst und gilt damit auch für Videohub
 Control und das Frontpanel. Umlaute funktionieren – am Gerät gegengelesen.

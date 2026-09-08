@@ -277,16 +277,16 @@ class BlackmagicVideohub extends IPSModule
 
         $data = $this->DecodeRows($Labels);
 
-        // Kommt aus dem onClick nichts Brauchbares, greifen wir auf die
-        // gespeicherten Listen zurück – die stehen nach "Übernehmen" bereit.
-        $fromProperties = false;
+        // Regelfall: Der Button übergibt nichts, denn Symcon stellt Listenwerte im
+        // onClick nicht als Variable bereit. Gelesen wird deshalb, was "Übernehmen"
+        // in den Properties abgelegt hat. Ein übergebenes Payload hat Vorrang,
+        // damit die Funktion auch aus Skripten heraus brauchbar bleibt.
         if (count($this->DecodeRows(isset($data['inputs']) ? $data['inputs'] : null)) === 0
             && count($this->DecodeRows(isset($data['outputs']) ? $data['outputs'] : null)) === 0) {
             $data = [
                 'inputs'  => $this->ReadPropertyString('InputLabels'),
                 'outputs' => $this->ReadPropertyString('OutputLabels')
             ];
-            $fromProperties = true;
         }
 
         $topology = $this->GetTopology();
@@ -336,17 +336,18 @@ class BlackmagicVideohub extends IPSModule
         }
 
         if ($seen === 0) {
-            $hint = 'Es kamen keine Zeilen an. Bitte die Beschriftung bearbeiten, mit "Übernehmen" speichern '
-                . 'und dann erneut übertragen.';
+            $hint = 'Es ist noch keine Beschriftung gespeichert. Bitte die Listen ausfüllen '
+                . 'und mit "Übernehmen" speichern, dann erneut übertragen.';
             if (trim((string)$Labels) !== '') {
-                $hint .= ' (Das Formular lieferte: ' . substr($Labels, 0, 120) . ')';
+                $hint .= ' (Übergeben wurde: ' . substr($Labels, 0, 120) . ')';
             }
             echo $hint;
             return;
         }
 
         if ($sent === 0) {
-            echo 'Keine Änderung – die ' . $seen . ' Zeilen stimmen mit dem Videohub überein.';
+            echo 'Keine Änderung – die ' . $seen . ' gespeicherten Zeilen stimmen mit dem Videohub überein. '
+                . 'Falls gerade etwas geändert wurde: erst "Übernehmen" klicken, dann übertragen.';
             return;
         }
 
