@@ -98,6 +98,11 @@
       "code": 104,
       "icon": "inactive",
       "caption": "Keine Adresse eingetragen"
+    },
+    {
+      "code": 201,
+      "icon": "error",
+      "caption": "Kein Client Socket verbunden"
     }
   ]
 }

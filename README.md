@@ -22,7 +22,20 @@ https://github.com/JLDFACE/Symcon-Blackmagic
 ```
 
 Danach eine Instanz „Blackmagic Videohub" anlegen und die IP-Adresse eintragen.
-Der Client Socket wird automatisch angelegt und konfiguriert.
+Über die Konsole wird der Client Socket automatisch angelegt und vom Modul mit
+Adresse und Port versorgt.
+
+Wird die Instanz **per Skript** angelegt, muss der Socket mit verbunden werden –
+der Kernel lässt eine Instanz sich nicht aus ihrem eigenen `ApplyChanges` heraus
+mit einem Parent verbinden. Ohne Socket meldet die Instanz Status 201:
+
+```php
+$id   = IPS_CreateInstance('{5C34AC39-6DD6-4EC6-9CA2-1AB49E958998}');
+$sock = IPS_CreateInstance('{3CFF0FD9-E306-41DB-9B5A-9D06D38576C3}'); // Client Socket
+IPS_ConnectInstance($id, $sock);
+IPS_SetProperty($id, 'Host', '192.168.0.10');
+IPS_ApplyChanges($id);
+```
 
 ## Konfiguration
 

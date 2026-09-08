@@ -69,7 +69,6 @@ class BlackmagicVideohub extends IPSModule
         $host = trim($this->ReadPropertyString('Host'));
 
         if (IPS_GetKernelRunlevel() == KR_READY) {
-            $this->EnsureParent();
             $this->ConfigureParent();
         }
 
@@ -87,6 +86,17 @@ class BlackmagicVideohub extends IPSModule
 
         $interval = max(10, (int)$this->ReadPropertyInteger('WatchdogInterval'));
         $this->SetTimerInterval('Watchdog', $interval * 1000);
+
+        // Ohne Client Socket läuft nichts. Der Kernel lässt eine Instanz sich nicht
+        // aus dem eigenen ApplyChanges heraus verbinden – über die Konsole erledigt
+        // das RequireParent(), per Skript angelegte Instanzen brauchen ein
+        // IPS_ConnectInstance() von außen. Hier wird das Fehlen nur sichtbar gemacht.
+        if ($this->GetConnectionID() == 0) {
+            $this->SetValueIfChanged('Online', false);
+            $this->SetStatus(201);
+            return;
+        }
+
         $this->SetStatus(102);
     }
 
@@ -785,27 +795,6 @@ class BlackmagicVideohub extends IPSModule
     }
 
     // ---------------------------------------------------------------- Helfer
-
-    /**
-     * RequireParent() legt den Client Socket nur an, wenn die Instanz über die
-     * Konsole entsteht – per IPS_CreateInstance angelegte Instanzen bleiben ohne
-     * Socket zurück. ConnectParent() holt das nach. Kein IPS_CreateInstance an
-     * dieser Stelle: Ein Verbinden aus dem eigenen ApplyChanges heraus greift
-     * nicht, und übrig bleibt bei jedem Aufruf ein herrenloser Socket.
-     */
-    private function EnsureParent()
-    {
-        if ($this->GetConnectionID() > 0) {
-            return;
-        }
-
-        $this->ConnectParent(self::IO_MODULE);
-
-        $connID = $this->GetConnectionID();
-        if ($connID > 0 && IPS_GetName($connID) === 'Client Socket') {
-            @IPS_SetName($connID, 'Videohub Socket');
-        }
-    }
 
     private function ConfigureParent()
     {
